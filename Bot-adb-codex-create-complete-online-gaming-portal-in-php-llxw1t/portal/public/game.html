@@ -9,7 +9,7 @@
 <body>
 <header>
   <a href="/index.html" class="back-link">← Voltar ao lobby</a>
-  <a href="/account.html" class="back-link">Conta</a> · <a href="/profile.html" class="back-link">Perfil</a> · <a href="/admin.html" class="back-link">Admin</a>
+  <a href="/account.html" class="back-link">Conta</a> · <a href="/profile.html" class="back-link">Perfil</a> · <a href="/admin.html" class="back-link admin-only" style="display:none">Admin</a>
   <h1 id="game-title">Jogo</h1>
   <p id="game-sub">Página dedicada do jogo selecionado.</p>
 </header>
@@ -163,7 +163,26 @@
     </form>
     <pre id="coin-result"></pre>
   </section>
+
+  <section id="football-panel" class="game-panel" style="display:none">
+    <h2>Futebol 1X2 (Ultra)</h2>
+    <form id="football-form">
+      <input name="home" placeholder="Equipa Casa" value="Clube Azul" required />
+      <input name="away" placeholder="Equipa Fora" value="Clube Branco" required />
+      <input name="amount" type="number" step="0.01" min="5" placeholder="Stake (min 5)" required />
+      <input type="hidden" name="pick" id="football-pick" value="home" />
+      <label>Mercado</label>
+      <div class="pad-grid" id="football-picks">
+        <button type="button" class="pad active" data-target="football-pick" data-value="home">1 - Casa</button>
+        <button type="button" class="pad" data-target="football-pick" data-value="draw">X - Empate</button>
+        <button type="button" class="pad" data-target="football-pick" data-value="away">2 - Fora</button>
+      </div>
+      <button>Gerar ticket</button>
+    </form>
+    <pre id="football-result"></pre>
+  </section>
 </main>
+<script src="/assets/js/auth-guard.js"></script>
 <script src="/assets/js/game.js"></script>
 </body>
 </html>

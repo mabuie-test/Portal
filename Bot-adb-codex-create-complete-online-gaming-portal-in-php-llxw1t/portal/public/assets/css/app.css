@@ -3,7 +3,7 @@ body{font-family:Inter,system-ui,sans-serif;margin:0;background:radial-gradient(
 header{padding:1rem;background:#1e293b}
 .back-link{color:#bfdbfe;text-decoration:none;display:inline-block;margin-bottom:.4rem;padding:.35rem .6rem;border:1px solid rgba(147,197,253,.25);border-radius:999px;transition:all .2s ease}
 .back-link:hover{border-color:#38bdf8;color:#e0f2fe;background:rgba(14,116,144,.18)}
-.hero{max-width:1180px;margin:1rem auto 0;padding:1.4rem 1.4rem 1.1rem;border-radius:18px;background:linear-gradient(145deg,rgba(15,23,42,.92),rgba(30,41,59,.8));border:1px solid rgba(148,163,184,.22);box-shadow:0 18px 44px rgba(2,6,23,.45)}
+.hero{max-width:1180px;margin:1rem auto 0;padding:1.4rem 1.4rem 1.1rem;border-radius:18px;background:linear-gradient(145deg,rgba(15,23,42,.92),rgba(30,41,59,.8));border:1px solid rgba(148,163,184,.22);box-shadow:0 18px 44px rgba(2,6,23,.45);position:relative;overflow:hidden}
 .hero h1{margin:.3rem 0 .45rem;font-size:clamp(1.45rem,3vw,2.2rem);letter-spacing:.01em}
 .hero p{margin:.1rem 0 .8rem;color:#cbd5e1;max-width:74ch}
 .hero-top{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap}
@@ -61,6 +61,7 @@ pre{background:#0b1324;padding:.5rem;border-radius:6px;min-height:64px;overflow:
 .game-tile[data-game='aviator'] img{background:linear-gradient(120deg,#0b2442,#1d4ed8 60%,#60a5fa)}
 .game-tile[data-game='coinflip'] img{background:radial-gradient(circle at 40% 40%,#fde68a,#f59e0b 50%,#92400e)}
 .game-tile[data-game='wheel'] img{background:conic-gradient(from 30deg,#7c3aed,#ec4899,#f59e0b,#22c55e,#0ea5e9,#7c3aed)}
+.game-tile[data-game='football'] img{background:linear-gradient(135deg,#14532d,#22c55e,#86efac)}
 .game-tile span{font-weight:800;font-size:1rem}
 .game-tile small{color:#bfdbfe;opacity:.9;font-size:.78rem}
 @media(max-width:1200px){.wallet-panel{grid-template-columns:1fr 1fr}.balance-box{grid-column:1/-1}.lobby{grid-template-columns:repeat(3,minmax(180px,1fr))}}
@@ -92,3 +93,5 @@ pre{background:#0b1324;padding:.5rem;border-radius:6px;min-height:64px;overflow:
 .pad:hover{transform:translateY(-1px);border-color:#38bdf8}
 .pad.active{background:linear-gradient(145deg,#22c55e,#15803d);color:#03170a;border-color:#86efac}
 .pad.selected{background:linear-gradient(145deg,#f59e0b,#d97706);color:#2a1702;border-color:#facc15}
+
+.hero:after{content:'';position:absolute;inset:auto -90px -90px auto;width:260px;height:260px;border-radius:999px;background:radial-gradient(circle,#22d3ee44 0,#0000 70%);pointer-events:none}

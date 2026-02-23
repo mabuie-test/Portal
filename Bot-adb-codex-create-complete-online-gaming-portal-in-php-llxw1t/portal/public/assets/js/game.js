@@ -17,6 +17,7 @@ const GAME_META = {
   coinflip:{name:'Cara ou Coroa',img:'/assets/img/coin.svg',kind:'coinflip',freq:175,sprite:'🪙'},
   wheel:{name:'Roda da Sorte',img:'/assets/img/wheel.svg',kind:'wheel',freq:165},
   dice:{name:'Duelo de Dados',img:'/assets/img/dice.svg',kind:'dice',freq:190},
+  football:{name:'Futebol 1X2',img:'/assets/img/football.svg',kind:'football',freq:188,sprite:'⚽'},
 };
 
 const params = new URLSearchParams(location.search);
@@ -31,7 +32,9 @@ if (crashSprite && meta.sprite) crashSprite.textContent = meta.sprite;
 
 document.getElementById('game-sub').textContent = meta.kind === 'coinflip'
   ? 'Jogo de moeda com prova justa por seed/hmac.'
-  : 'Jogo crash em rounds contínuos; entra e cashout antes do crash.';
+  : (meta.kind === 'football'
+    ? 'Modo futebol 1X2 com ticket inteligente, odds dinâmicas e sugestão de autoestratégia.'
+    : 'Jogo crash em rounds contínuos; entra e cashout antes do crash.');
 
 if (meta.kind === 'coinflip') {
   document.getElementById('crash-panel').style.display = 'none';
@@ -47,6 +50,11 @@ if (meta.kind === 'dice') {
   document.getElementById('crash-panel').style.display = 'none';
   document.getElementById('crash-scene').style.display = 'none';
   document.getElementById('dice-panel').style.display = 'block';
+}
+if (meta.kind === 'football') {
+  document.getElementById('crash-panel').style.display = 'none';
+  document.getElementById('crash-scene').style.display = 'none';
+  document.getElementById('football-panel').style.display = 'block';
 }
 
 let audioEnabled = true;
@@ -107,6 +115,7 @@ bindPads('dice-selection-pads');
 bindPads('coin-choice-pads');
 bindAmountPads('wheel-amount-pads', 'wheel-form');
 bindAmountPads('coin-amount-pads', 'coin-form');
+bindPads('football-picks');
 
 let latestBetId = null;
 let selectedAutoCashout = null;
@@ -244,6 +253,36 @@ coinForm?.addEventListener('submit', async (e)=>{
   setTimeout(()=> coinEl?.classList.remove('spin'), 3200);
   setBalance(localBalance - Number(payload.amount || 0) + Number(d?.data?.payout || 0));
   document.getElementById('coin-result').textContent = JSON.stringify(d, null, 2);
+});
+
+const footballForm = document.getElementById('football-form');
+footballForm?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const payload = Object.fromEntries(new FormData(footballForm));
+  const amount = Math.max(5, Number(payload.amount || 0));
+  const seed = ((payload.home || '') + (payload.away || '') + new Date().toISOString()).split('').reduce((a,c)=>a + c.charCodeAt(0), 0);
+  const randomFactor = 0.85 + ((seed % 33) / 100);
+  const odds = {
+    home: Number((1.65 * randomFactor).toFixed(2)),
+    draw: Number((3.2 * randomFactor).toFixed(2)),
+    away: Number((2.4 * randomFactor).toFixed(2)),
+  };
+  const pick = payload.pick || 'home';
+  const possible = Number((amount * (odds[pick] || 1)).toFixed(2));
+  const ticket = {
+    match: `${payload.home} vs ${payload.away}`,
+    mercado: '1X2',
+    selecao: pick === 'home' ? 'Casa (1)' : pick === 'away' ? 'Fora (2)' : 'Empate (X)',
+    stake: amount,
+    odds,
+    retorno_potencial: possible,
+    sugestao_auto: {
+      auto_cashout_recomendado: pick === 'draw' ? 3.0 : 2.0,
+      modo: 'conservador'
+    }
+  };
+  document.getElementById('football-result').textContent = JSON.stringify(ticket, null, 2);
+  tone(meta.freq + 30, .2, .03);
 });
 
 const status = document.getElementById('status');

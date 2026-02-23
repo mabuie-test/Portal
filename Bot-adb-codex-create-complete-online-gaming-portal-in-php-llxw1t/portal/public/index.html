@@ -13,7 +13,7 @@
       <nav>
         <a class="back-link" href="/account.html">Conta</a>
         <a class="back-link" href="/profile.html">Perfil</a>
-        <a class="back-link" href="/admin.html">Admin</a>
+        <a class="back-link admin-only" href="/admin.html" style="display:none">Admin</a>
       </nav>
     </div>
     <h1>Escolhe o teu jogo e entra em tempo real</h1>
@@ -39,8 +39,10 @@
     <a class="game-tile" data-game="wheel" href="/game.html?game=wheel"><img src="/assets/img/wheel.svg" alt="Wheel"/><span>Roda da Sorte</span><small>Odds variadas em roda animada</small></a>
     <a class="game-tile" data-game="dice" href="/game.html?game=dice"><img src="/assets/img/dice.svg" alt="Dice Duel"/><span>Duelo de Dados</span><small>Duelos por soma e paridade</small></a>
     <a class="game-tile" data-game="coinflip" href="/game.html?game=coinflip"><img src="/assets/img/coin.svg" alt="Cara ou Coroa"/><span>Cara ou Coroa</span><small>50/50 com prova justa</small></a>
+    <a class="game-tile" data-game="football" href="/game.html?game=football"><img src="/assets/img/football.svg" alt="Futebol"/><span>Futebol</span><small>Apostas 1X2 com odds dinâmicas</small></a>
   </main>
 
+  <script src="/assets/js/auth-guard.js"></script>
   <script src="/assets/js/app.js"></script>
 </body>
 </html>
