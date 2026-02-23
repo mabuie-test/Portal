@@ -4,7 +4,7 @@ async function getJSON(url, options = {}) {
 }
 
 const GAME_META = {
-  aviator:{name:'Aviator',img:'/assets/img/aviator.svg',kind:'crash',freq:170},
+  aviator:{name:'Aviator',img:'/assets/img/aviator.svg',kind:'crash',freq:170,sprite:'✈️'},
   rocket:{name:'Rocket',img:'/assets/img/rocket.svg',kind:'crash',freq:185},
   balloon:{name:'Balloon',img:'/assets/img/balloon.svg',kind:'crash',freq:160},
   race:{name:'Race',img:'/assets/img/race.svg',kind:'crash',freq:200},
@@ -14,7 +14,7 @@ const GAME_META = {
   jackpot:{name:'Jackpot',img:'/assets/img/jackpot.svg',kind:'crash',freq:195},
   tournament:{name:'Tournament',img:'/assets/img/tournament.svg',kind:'crash',freq:180},
   demo:{name:'Demo',img:'/assets/img/demo.svg',kind:'crash',freq:140},
-  coinflip:{name:'Cara ou Coroa',img:'/assets/img/coin.svg',kind:'coinflip',freq:175},
+  coinflip:{name:'Cara ou Coroa',img:'/assets/img/coin.svg',kind:'coinflip',freq:175,sprite:'🪙'},
   wheel:{name:'Roda da Sorte',img:'/assets/img/wheel.svg',kind:'wheel',freq:165},
   dice:{name:'Duelo de Dados',img:'/assets/img/dice.svg',kind:'dice',freq:190},
 };
@@ -26,6 +26,8 @@ const meta = GAME_META[game] || GAME_META.aviator;
 document.getElementById('game-title').textContent = meta.name;
 document.getElementById('game-name').textContent = meta.name;
 document.getElementById('game-image').src = meta.img;
+const crashSprite = document.getElementById('crash-sprite');
+if (crashSprite && meta.sprite) crashSprite.textContent = meta.sprite;
 
 document.getElementById('game-sub').textContent = meta.kind === 'coinflip'
   ? 'Jogo de moeda com prova justa por seed/hmac.'
@@ -33,14 +35,17 @@ document.getElementById('game-sub').textContent = meta.kind === 'coinflip'
 
 if (meta.kind === 'coinflip') {
   document.getElementById('crash-panel').style.display = 'none';
+  document.getElementById('crash-scene').style.display = 'none';
   document.getElementById('coin-panel').style.display = 'block';
 }
 if (meta.kind === 'wheel') {
   document.getElementById('crash-panel').style.display = 'none';
+  document.getElementById('crash-scene').style.display = 'none';
   document.getElementById('wheel-panel').style.display = 'block';
 }
 if (meta.kind === 'dice') {
   document.getElementById('crash-panel').style.display = 'none';
+  document.getElementById('crash-scene').style.display = 'none';
   document.getElementById('dice-panel').style.display = 'block';
 }
 
@@ -106,13 +111,28 @@ bindAmountPads('coin-amount-pads', 'coin-form');
 let latestBetId = null;
 let selectedAutoCashout = null;
 let localBalance = 0;
+let previousPhase = 'starting';
+let autoBetPlacedInRound = false;
+let autoBetCounter = 0;
 const walletUserInput = document.getElementById('wallet_user_id');
 const betUserInput = document.getElementById('bet_user_id');
 const stakeInput = document.getElementById('stake_amount');
 const balanceEl = document.getElementById('wallet-balance');
+const autoBetEnabled = document.getElementById('auto-bet-enabled');
+const autoBetRounds = document.getElementById('auto-bet-rounds');
+const autoBetDelay = document.getElementById('auto-bet-delay');
+const autoBetStopOnLoss = document.getElementById('auto-bet-stop-on-loss');
+const autoBetStatus = document.getElementById('auto-bet-status');
+const roundIdInput = document.getElementById('round_id');
+const gameResultEl = document.getElementById('game-result');
 
 function setBalance(v){localBalance = Number(v || 0); if (balanceEl) balanceEl.textContent = `${localBalance.toFixed(2)} MZN`;}
 function setStake(v){if (stakeInput) stakeInput.value = Math.max(0, Number(v || 0)).toFixed(2);} 
+function setAutoBetStatus(message, isError = false) {
+  if (!autoBetStatus) return;
+  autoBetStatus.textContent = message;
+  autoBetStatus.style.color = isError ? '#fca5a5' : '#93c5fd';
+}
 
 document.getElementById('load-balance')?.addEventListener('click', async ()=>{
   const userId = Number(walletUserInput?.value || betUserInput?.value || 0);
@@ -142,25 +162,43 @@ document.getElementById('auto-cashout-3')?.addEventListener('click', ()=>setAuto
 
 document.getElementById('create-round')?.addEventListener('click', async ()=>{
   const d = await getJSON('/api/rounds', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({game})});
-  document.getElementById('round_id').value = d.data.round_id;
-  document.getElementById('game-result').textContent = JSON.stringify(d, null, 2);
+  roundIdInput.value = d.data.round_id;
+  gameResultEl.textContent = JSON.stringify(d, null, 2);
 });
+
+async function createRoundAndBet() {
+  const payload = Object.fromEntries(new FormData(betForm));
+  const amount = Number(payload.amount || 0);
+  if (!payload.user_id || amount < 5) {
+    setAutoBetStatus('Preencha User ID e stake mínima de 5 MZN.', true);
+    return;
+  }
+  if (!payload.round_id) {
+    const round = await getJSON('/api/rounds', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({game})});
+    if (round?.data?.round_id) {
+      payload.round_id = String(round.data.round_id);
+      roundIdInput.value = payload.round_id;
+    }
+  }
+  if (selectedAutoCashout) payload.auto_cashout = selectedAutoCashout;
+  const d = await getJSON('/api/bets', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+  latestBetId = d.bet_id;
+  setBalance(localBalance - amount);
+  gameResultEl.textContent = JSON.stringify(d, null, 2);
+  return d;
+}
 
 const betForm = document.getElementById('bet-form');
 betForm?.addEventListener('submit', async (e)=>{
   e.preventDefault();
-  const payload = Object.fromEntries(new FormData(betForm));
-  if (selectedAutoCashout) payload.auto_cashout = selectedAutoCashout;
-  const d = await getJSON('/api/bets', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
-  latestBetId = d.bet_id; setBalance(localBalance - Number(payload.amount||0));
-  document.getElementById('game-result').textContent = JSON.stringify(d, null, 2);
+  await createRoundAndBet();
 });
 
 document.getElementById('cashout')?.addEventListener('click', async ()=>{
   if (!latestBetId) return;
   const d = await getJSON('/api/bets/cashout', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({bet_id: latestBetId, multiplier: 2.0})});
   if (d?.data?.payout) setBalance(localBalance + Number(d.data.payout));
-  document.getElementById('game-result').textContent = JSON.stringify(d, null, 2);
+  gameResultEl.textContent = JSON.stringify(d, null, 2);
 });
 
 
@@ -218,11 +256,46 @@ function connectSSE(){
   const sse = new EventSource('/sse.php');
   sse.addEventListener('tick', (e)=>{
     const d = JSON.parse(e.data);
-    if (mult) mult.textContent = `${Number(d.multiplier).toFixed(2)}x`;
+    if (mult) {
+      mult.textContent = `${Number(d.multiplier).toFixed(2)}x`;
+      mult.classList.remove('live');
+      void mult.offsetWidth;
+      mult.classList.add('live');
+    }
     if (phaseEl) { phaseEl.textContent = d.phase; phaseEl.className = `phase-${d.phase}`; }
     if (roundIndexEl) roundIndexEl.textContent = d.round_index;
     if (crashPointEl) crashPointEl.textContent = Number(d.crash_point).toFixed(2);
     if (status) status.textContent = d.phase === 'crashed' ? 'Round crashado, aguardando próximo...' : 'Round ativo';
+    if (crashSprite) {
+      crashSprite.classList.remove('running', 'crashed');
+      if (d.phase === 'running') crashSprite.classList.add('running');
+      if (d.phase === 'crashed') crashSprite.classList.add('crashed');
+    }
+
+    if (previousPhase !== d.phase && d.phase === 'starting') autoBetPlacedInRound = false;
+    if (previousPhase !== d.phase && d.phase === 'crashed' && autoBetEnabled?.checked && !autoBetPlacedInRound) {
+      const maxRounds = Number(autoBetRounds?.value || 0);
+      if (!maxRounds || autoBetCounter < maxRounds) {
+        const delay = Math.max(200, Number(autoBetDelay?.value || 900));
+        setAutoBetStatus(`Autoaposta agendada em ${delay}ms... (${autoBetCounter + 1}/${maxRounds || '∞'})`);
+        setTimeout(async ()=>{
+          try {
+            await createRoundAndBet();
+            autoBetCounter += 1;
+            autoBetPlacedInRound = true;
+            setAutoBetStatus(`Autoaposta executada com sucesso (${autoBetCounter}/${maxRounds || '∞'}).`);
+          } catch (err) {
+            setAutoBetStatus('Falha na autoaposta. Verifique dados do formulário.', true);
+            if (autoBetStopOnLoss?.checked && autoBetEnabled) autoBetEnabled.checked = false;
+          }
+        }, delay);
+      } else {
+        setAutoBetStatus('Limite de rounds automáticos atingido.');
+        if (autoBetEnabled) autoBetEnabled.checked = false;
+      }
+    }
+
+    previousPhase = d.phase;
     const now = Date.now();
     if (now - lastTickSound > 350 && d.phase === 'running') { tone(meta.freq, .05, .015); lastTickSound = now; }
     if (d.phase === 'crashed') tone(meta.freq - 45, .14, .03);

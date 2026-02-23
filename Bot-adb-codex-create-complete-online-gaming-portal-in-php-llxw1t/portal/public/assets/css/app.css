@@ -20,7 +20,9 @@ button{background:#22c55e;color:#08130a;font-weight:700}
 button.secondary{background:#0ea5e9;color:#082f49}
 button.primary{background:#22c55e;color:#052e16}
 button.cashout{background:#f59e0b;color:#3f2504}
-#multiplier{font-size:2.3rem;font-weight:800;color:#38bdf8}
+#multiplier{font-size:2.3rem;font-weight:800;color:#38bdf8;background:linear-gradient(90deg,rgba(56,189,248,.15),rgba(14,165,233,.03));border:1px solid rgba(56,189,248,.32);padding:.45rem .65rem;border-radius:12px;display:inline-block;min-width:160px}
+#multiplier.live{animation:multPulse .65s ease-out}
+@keyframes multPulse{0%{transform:scale(1);box-shadow:0 0 0 rgba(56,189,248,0)}50%{transform:scale(1.06);box-shadow:0 0 20px rgba(56,189,248,.35)}100%{transform:scale(1);box-shadow:0 0 0 rgba(56,189,248,0)}}
 pre{background:#0b1324;padding:.5rem;border-radius:6px;min-height:64px;overflow:auto}
 .card{display:flex;gap:.8rem;background:#0b1324;border:1px solid #334155;border-radius:8px;padding:.5rem;align-items:center}
 .card img{width:74px;height:54px;object-fit:cover;border-radius:6px}
@@ -38,11 +40,27 @@ pre{background:#0b1324;padding:.5rem;border-radius:6px;min-height:64px;overflow:
 .chip{min-width:0}
 .bet-buttons{margin:.4rem 0 .2rem}
 .game-panel{border:1px solid #334155;box-shadow:0 8px 24px rgba(2,6,23,.35)}
+.crash-scene{position:relative;min-height:88px;margin:.75rem 0;border-radius:12px;border:1px solid rgba(56,189,248,.25);background:linear-gradient(180deg,#082f49 0%,#0f172a 100%);overflow:hidden}
+.crash-track{position:absolute;left:0;right:0;bottom:18px;height:2px;background:linear-gradient(90deg,transparent,#38bdf8 20%,#38bdf8 80%,transparent);opacity:.7}
+.crash-sprite{position:absolute;left:10px;bottom:18px;font-size:1.8rem;filter:drop-shadow(0 0 10px rgba(56,189,248,.45));transition:transform .28s ease}
+.crash-sprite.running{animation:flyPath .8s linear infinite}
+.crash-sprite.crashed{animation:crashDrop .6s ease forwards}
+@keyframes flyPath{0%{transform:translate(0,0) rotate(-8deg)}50%{transform:translate(10px,-8px) rotate(-2deg)}100%{transform:translate(22px,-16px) rotate(3deg)}}
+@keyframes crashDrop{0%{transform:translate(0,0) rotate(0)}100%{transform:translate(16px,26px) rotate(30deg);opacity:.3}}
+.autobet-box{margin:.7rem 0;padding:.7rem;border-radius:12px;background:rgba(14,23,42,.85);border:1px solid rgba(148,163,184,.25)}
+.autobet-box h3{margin:.05rem 0 .55rem;font-size:.98rem;color:#93c5fd}
+.autobet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.55rem}
+.autobet-grid label{display:flex;gap:.35rem;align-items:center;font-size:.85rem;color:#cbd5e1}
+.autobet-grid input[type='number']{margin:0;padding:.45rem .5rem}
+#auto-bet-status{margin:.5rem 0 0;color:#93c5fd;font-size:.84rem}
 .lobby{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:1rem;padding:1rem;max-width:1180px;margin:0 auto 1rem}
 .game-tile{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.2rem;background:linear-gradient(170deg,rgba(30,41,59,.94),rgba(15,23,42,.92));border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:.75rem;text-decoration:none;color:#e2e8f0;transition:transform .24s, border-color .24s, box-shadow .24s}
 .game-tile::after{content:"Jogar agora";position:absolute;right:.65rem;top:.6rem;font-size:.68rem;letter-spacing:.05em;text-transform:uppercase;color:#67e8f9;background:rgba(8,47,73,.55);border:1px solid rgba(103,232,249,.35);border-radius:999px;padding:.18rem .45rem}
 .game-tile:hover{transform:translateY(-5px);border-color:#38bdf8;box-shadow:0 18px 30px rgba(2,6,23,.5)}
 .game-tile img{width:100%;height:116px;object-fit:cover;border-radius:10px;margin-bottom:.4rem;background:linear-gradient(120deg,rgba(15,23,42,.8),rgba(30,58,138,.35))}
+.game-tile[data-game='aviator'] img{background:linear-gradient(120deg,#0b2442,#1d4ed8 60%,#60a5fa)}
+.game-tile[data-game='coinflip'] img{background:radial-gradient(circle at 40% 40%,#fde68a,#f59e0b 50%,#92400e)}
+.game-tile[data-game='wheel'] img{background:conic-gradient(from 30deg,#7c3aed,#ec4899,#f59e0b,#22c55e,#0ea5e9,#7c3aed)}
 .game-tile span{font-weight:800;font-size:1rem}
 .game-tile small{color:#bfdbfe;opacity:.9;font-size:.78rem}
 @media(max-width:1200px){.wallet-panel{grid-template-columns:1fr 1fr}.balance-box{grid-column:1/-1}.lobby{grid-template-columns:repeat(3,minmax(180px,1fr))}}
