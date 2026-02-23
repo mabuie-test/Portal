@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Conta</title>
+  <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+<body>
+<header>
+  <a href="/index.html" class="back-link">← Voltar</a>
+  <h1>Conta de Utilizador</h1>
+</header>
+<main class="grid">
+  <section class="auth-tabs">
+    <div class="tab-head">
+      <button type="button" class="tab-btn active" data-tab="login">Iniciar sessão</button>
+      <button type="button" class="tab-btn" data-tab="register">Criar conta</button>
+      <button type="button" class="tab-btn" data-tab="recover">Recuperar senha</button>
+    </div>
+
+    <div id="tab-login" class="tab-panel active">
+      <h2>Entrar</h2>
+      <form id="login-form">
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="password" type="password" placeholder="Senha" required />
+        <button>Entrar</button>
+      </form>
+      <p>Não tens uma conta? <a href="#" data-switch="register">Clique aqui para criar</a>.</p>
+      <p>Esqueceste a senha? <a href="#" data-switch="recover">Recuperar por email</a>.</p>
+      <pre id="login-result"></pre>
+    </div>
+
+    <div id="tab-register" class="tab-panel">
+      <h2>Criar conta (18+)</h2>
+      <form id="register-form">
+        <input name="full_name" placeholder="Nome completo" required />
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="phone" placeholder="Número de telemóvel" required />
+        <label>Data de nascimento</label>
+        <input name="birth_date" type="date" required />
+        <input name="password" type="password" placeholder="Senha" required />
+        <button>Criar conta</button>
+      </form>
+      <p>Tens uma conta? <a href="#" data-switch="login">Clique aqui para iniciar sessão</a>.</p>
+      <pre id="register-result"></pre>
+    </div>
+
+    <div id="tab-recover" class="tab-panel">
+      <h2>Recuperar senha por email</h2>
+      <form id="reset-request-form">
+        <input name="email" type="email" placeholder="Email" required />
+        <button>Solicitar recuperação</button>
+      </form>
+      <form id="reset-form">
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="token" placeholder="Token recebido" required />
+        <input name="new_password" type="password" placeholder="Nova senha" required />
+        <button>Redefinir senha</button>
+      </form>
+      <p>Lembrou a senha? <a href="#" data-switch="login">Voltar ao login</a>.</p>
+      <pre id="reset-result"></pre>
+    </div>
+  </section>
+</main>
+<script src="/assets/js/account.js"></script>
+</body>
+</html>

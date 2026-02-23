@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140">
+  <rect width="240" height="140" fill="#0b1324"/>
+  <path d="M30 95 C80 45, 150 40, 210 20" stroke="#38bdf8" stroke-width="6" fill="none"/>
+  <polygon points="142,45 170,42 150,60" fill="#fbbf24"/>
+  <text x="16" y="24" fill="#e2e8f0" font-size="16">AVIATOR</text>
+</svg>

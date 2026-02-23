@@ -1,0 +1,3 @@
+date,reference,phone,amount,currency,provider,status
+2026-01-10 11:00,MP123,258840000000,1500.00,MZN,m-pesa,success
+2026-01-10 11:20,TRX777,258850000001,500.00,MZN,bank,success

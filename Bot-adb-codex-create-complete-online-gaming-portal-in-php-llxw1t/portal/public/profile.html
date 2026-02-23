@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Perfil</title>
+  <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+<body>
+<header>
+  <a href="/index.html" class="back-link">← Voltar</a>
+  <h1>Perfil & Configurações</h1>
+</header>
+<main class="grid">
+  <section>
+    <h2>Consultar perfil</h2>
+    <form id="profile-form">
+      <input name="user_id" type="number" placeholder="User ID" required />
+      <button>Carregar perfil</button>
+    </form>
+    <div class="user-code-view">ID Jogador: <strong id="user-code">00000</strong></div><div class="avatar-view"><img id="avatar-preview" src="/assets/img/coin.svg" alt="avatar"/></div><pre id="profile-result"></pre>
+  </section>
+
+  <section>
+    <h2>Preferências da conta</h2>
+    <form id="prefs-form">
+      <input name="user_id" type="number" placeholder="User ID" required />
+      <input name="display_name" placeholder="Nome de exibição" />
+      <select name="theme"><option value="dark">Dark</option><option value="light">Light</option></select><input name="avatar_url" placeholder="URL do avatar"/>
+      <select name="sound_enabled"><option value="true">Som ON</option><option value="false">Som OFF</option></select>
+      <button>Guardar preferências</button>
+    </form>
+    <pre id="prefs-result"></pre>
+  </section>
+
+  <section>
+    <h2>Histórico de apostas</h2>
+    <form id="bets-history-form">
+      <input name="user_id" type="number" placeholder="User ID" required />
+      <button>Ver histórico</button>
+    </form>
+    <pre id="bets-history-result"></pre>
+  </section>
+
+  <section>
+    <h2>Levantamentos</h2>
+    <form id="withdrawals-form">
+      <input name="user_id" type="number" placeholder="User ID" required />
+      <button>Ver levantamentos</button>
+    </form>
+    <pre id="withdrawals-result"></pre>
+  </section>
+</main>
+<script src="/assets/js/profile.js"></script>
+</body>
+</html>

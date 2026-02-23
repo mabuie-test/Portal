@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="pt">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Admin</title><link rel="stylesheet" href="/assets/css/app.css"/></head>
+<body>
+<header><a class="back-link" href="/index.html">← Voltar</a><h1>Painel Administrativo</h1></header>
+<main class="grid">
+<section><h2>Utilizadores</h2><button id="admin-users">Carregar</button><pre id="admin-users-result"></pre></section>
+<section><h2>Pagamentos pendentes</h2><button id="admin-pending">Listar</button><pre id="admin-pending-result"></pre></section>
+<section><h2>Validar/Rejeitar submissão</h2><form id="admin-verify-form"><input name="submission_id" type="number" placeholder="submission_id" required/><input name="note" placeholder="nota"/><button>Validar</button></form><form id="admin-reject-form"><input name="submission_id" type="number" placeholder="submission_id" required/><input name="note" placeholder="motivo"/><button>Rejeitar</button></form><pre id="admin-action-result"></pre></section>
+<section><h2>Relatório financeiro</h2><button id="admin-report">Gerar</button><pre id="admin-report-result"></pre></section>
+<section><h2>Ativar/Desativar jogo</h2><form id="admin-game-form"><input name="shortcode" placeholder="shortcode" required/><select name="status"><option value="active">active</option><option value="inactive">inactive</option><option value="maintenance">maintenance</option></select><button>Atualizar</button></form><pre id="admin-game-result"></pre></section>
+</main>
+<script src="/assets/js/admin.js"></script>
+</body></html>

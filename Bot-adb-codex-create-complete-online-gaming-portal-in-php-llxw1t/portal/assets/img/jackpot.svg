@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140">
+  <rect width="240" height="140" fill="#0b1324"/>
+  <circle cx="58" cy="70" r="28" fill="#f43f5e" opacity="0.85"/>
+  <path d="M20 110 C80 30, 160 35, 220 16" stroke="#f43f5e" stroke-width="6" fill="none"/>
+  <text x="16" y="24" fill="#e2e8f0" font-size="16">JACKPOT</text>
+</svg>
