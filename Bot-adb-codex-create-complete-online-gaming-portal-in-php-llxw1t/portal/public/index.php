@@ -45,6 +45,36 @@ $router->add('GET', '/api/admin/payments/pending', [$controller, 'adminPendingSu
 $router->add('GET', '/api/admin/users', [$controller, 'adminUsers']);
 $router->add('POST', '/api/wheel/play', [$controller, 'playWheel']);
 $router->add('POST', '/api/dice-duel/play', [$controller, 'playDiceDuel']);
+$router->add('GET', '/api/football/events', [$controller, 'footballEvents']);
+$router->add('POST', '/api/football/tickets', [$controller, 'footballTicketCreate']);
+$router->add('GET', '/api/football/tickets', [$controller, 'footballTicketHistory']);
+$router->add('POST', '/api/admin/football/events', [$controller, 'adminFootballEventCreate']);
+$router->add('POST', '/api/admin/football/events/delete', [$controller, 'adminFootballEventDelete']);
+$router->add('POST', '/api/admin/football/events/odds', [$controller, 'adminFootballEventOddsUpsert']);
+$router->add('POST', '/api/admin/football/events/result', [$controller, 'adminFootballEventResult']);
+$router->add('POST', '/api/admin/football/events/postpone', [$controller, 'adminFootballEventPostpone']);
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
+if ($path === '/') {
+    header('Content-Type: text/html; charset=utf-8');
+    readfile(__DIR__ . '/index.html');
+    return;
+}
+
+$publicFile = realpath(__DIR__ . $path);
+$publicRoot = realpath(__DIR__);
+if (
+    $publicFile !== false
+    && $publicRoot !== false
+    && str_starts_with($publicFile, $publicRoot)
+    && is_file($publicFile)
+    && pathinfo($publicFile, PATHINFO_EXTENSION) !== 'php'
+) {
+    $mime = mime_content_type($publicFile) ?: 'application/octet-stream';
+    header('Content-Type: ' . $mime);
+    readfile($publicFile);
+    return;
+}
+
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $path);

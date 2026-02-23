@@ -1,14 +1,35 @@
 <!doctype html>
 <html lang="pt">
 <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Admin</title><link rel="stylesheet" href="/assets/css/app.css"/></head>
-<body>
+<body data-page="admin">
 <header><a class="back-link" href="/index.html">← Voltar</a><h1>Painel Administrativo</h1></header>
-<main class="grid">
+<main id="admin-root" class="grid">
 <section><h2>Utilizadores</h2><button id="admin-users">Carregar</button><pre id="admin-users-result"></pre></section>
 <section><h2>Pagamentos pendentes</h2><button id="admin-pending">Listar</button><pre id="admin-pending-result"></pre></section>
 <section><h2>Validar/Rejeitar submissão</h2><form id="admin-verify-form"><input name="submission_id" type="number" placeholder="submission_id" required/><input name="note" placeholder="nota"/><button>Validar</button></form><form id="admin-reject-form"><input name="submission_id" type="number" placeholder="submission_id" required/><input name="note" placeholder="motivo"/><button>Rejeitar</button></form><pre id="admin-action-result"></pre></section>
 <section><h2>Relatório financeiro</h2><button id="admin-report">Gerar</button><pre id="admin-report-result"></pre></section>
 <section><h2>Ativar/Desativar jogo</h2><form id="admin-game-form"><input name="shortcode" placeholder="shortcode" required/><select name="status"><option value="active">active</option><option value="inactive">inactive</option><option value="maintenance">maintenance</option></select><button>Atualizar</button></form><pre id="admin-game-result"></pre></section>
+<section>
+  <h2>Futebol - Eventos</h2>
+  <form id="admin-football-create">
+    <input name="event_code" placeholder="Código (opcional)" />
+    <input name="league" placeholder="Liga" value="Liga Moçambique" required />
+    <input name="home_team" placeholder="Casa" required />
+    <input name="away_team" placeholder="Fora" required />
+    <input name="starts_at" placeholder="YYYY-MM-DD HH:MM:SS" required />
+    <textarea name="odds_json" placeholder='JSON odds [{"market_type":"1x2","selection_key":"home","odd":1.9}]'></textarea>
+    <button>Criar evento</button>
+  </form>
+  <form id="admin-football-delete"><input name="event_id" type="number" placeholder="event_id" required/><button>Eliminar evento</button></form>
+  <form id="admin-football-postpone"><input name="event_id" type="number" placeholder="event_id" required/><button>Adiar evento</button></form>
+  <form id="admin-football-result-form"><input name="event_id" type="number" placeholder="event_id" required/><input name="home_score" type="number" placeholder="Golos casa" required/><input name="away_score" type="number" placeholder="Golos fora" required/><input name="first_scorer" placeholder="Primeiro marcador"/><button>Aplicar resultado</button></form>
+  <form id="admin-football-odds"><input name="event_id" type="number" placeholder="event_id" required/><textarea name="odds_json" placeholder='JSON odds [{"market_type":"total_goals","selection_key":"over","line_value":2.5,"odd":1.8}]'></textarea><button>Atualizar odds</button></form>
+  <pre id="admin-football-output"></pre>
+</section>
 </main>
+<main id="admin-denied" class="grid" style="display:none">
+<section><h2>Acesso restrito</h2><p>Esta área está disponível apenas para suporte e administradores autenticados.</p></section>
+</main>
+<script src="/assets/js/auth-guard.js"></script>
 <script src="/assets/js/admin.js"></script>
 </body></html>

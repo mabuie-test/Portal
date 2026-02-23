@@ -23,6 +23,7 @@ use App\Services\WheelService;
 use App\Services\DiceDuelService;
 use App\Services\ProfileService;
 use App\Services\AuthService;
+use App\Services\FootballBettingService;
 
 final class ApiController
 {
@@ -362,5 +363,100 @@ final class ApiController
             return;
         }
         Response::json(['data' => $row]);
+    }
+
+    public function footballEvents(): void
+    {
+        $svc = new FootballBettingService();
+        Response::json(['data' => $svc->listEvents()]);
+    }
+
+    public function footballTicketCreate(): void
+    {
+        $data = json_decode((string) file_get_contents('php://input'), true) ?: [];
+        $svc = new FootballBettingService();
+        try {
+            $ticket = $svc->placeTicket((int) ($data['user_id'] ?? 0), (float) ($data['stake'] ?? 0), (array) ($data['selections'] ?? []));
+            Response::json(['message' => 'Bilhete criado', 'data' => $ticket], 201);
+        } catch (\Throwable $e) {
+            Response::json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    public function footballTicketHistory(): void
+    {
+        $userId = (int) ($_GET['user_id'] ?? ($_SESSION['user_id'] ?? 0));
+        if ($userId <= 0) {
+            Response::json(['error' => 'user_id é obrigatório'], 422);
+            return;
+        }
+        $svc = new FootballBettingService();
+        Response::json(['data' => $svc->listTickets($userId)]);
+    }
+
+    public function adminFootballEventCreate(): void
+    {
+        try {
+            $this->requireAdmin();
+        } catch (\Throwable $e) {
+            Response::json(['error' => $e->getMessage()], 403);
+            return;
+        }
+        $data = json_decode((string) file_get_contents('php://input'), true) ?: [];
+        $svc = new FootballBettingService();
+        $event = $svc->adminCreateEvent($data, (int) ($_SESSION['user_id'] ?? 0));
+        Response::json(['message' => 'Evento criado', 'data' => $event], 201);
+    }
+
+    public function adminFootballEventDelete(): void
+    {
+        try {
+            $this->requireAdmin();
+        } catch (\Throwable $e) {
+            Response::json(['error' => $e->getMessage()], 403);
+            return;
+        }
+        $data = json_decode((string) file_get_contents('php://input'), true) ?: [];
+        (new FootballBettingService())->adminDeleteEvent((int) ($data['event_id'] ?? 0));
+        Response::json(['message' => 'Evento removido']);
+    }
+
+    public function adminFootballEventOddsUpsert(): void
+    {
+        try {
+            $this->requireAdmin();
+        } catch (\Throwable $e) {
+            Response::json(['error' => $e->getMessage()], 403);
+            return;
+        }
+        $data = json_decode((string) file_get_contents('php://input'), true) ?: [];
+        (new FootballBettingService())->adminUpsertOdds((int) ($data['event_id'] ?? 0), (array) ($data['odds'] ?? []));
+        Response::json(['message' => 'Odds atualizadas']);
+    }
+
+    public function adminFootballEventResult(): void
+    {
+        try {
+            $this->requireAdmin();
+        } catch (\Throwable $e) {
+            Response::json(['error' => $e->getMessage()], 403);
+            return;
+        }
+        $data = json_decode((string) file_get_contents('php://input'), true) ?: [];
+        (new FootballBettingService())->adminSetResult((int) ($data['event_id'] ?? 0), $data, (int) ($_SESSION['user_id'] ?? 0));
+        Response::json(['message' => 'Resultado aplicado e bilhetes processados']);
+    }
+
+    public function adminFootballEventPostpone(): void
+    {
+        try {
+            $this->requireAdmin();
+        } catch (\Throwable $e) {
+            Response::json(['error' => $e->getMessage()], 403);
+            return;
+        }
+        $data = json_decode((string) file_get_contents('php://input'), true) ?: [];
+        (new FootballBettingService())->adminSetEventPostponed((int) ($data['event_id'] ?? 0), (int) ($_SESSION['user_id'] ?? 0));
+        Response::json(['message' => 'Evento adiado e bilhetes processados']);
     }
 }

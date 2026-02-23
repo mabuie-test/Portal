@@ -9,7 +9,7 @@
 <body>
 <header>
   <a href="/index.html" class="back-link">← Voltar ao lobby</a>
-  <a href="/account.html" class="back-link">Conta</a> · <a href="/profile.html" class="back-link">Perfil</a> · <a href="/admin.html" class="back-link">Admin</a>
+  <a href="/account.html" class="back-link">Conta</a> · <a href="/profile.html" class="back-link">Perfil</a> · <a href="/admin.html" class="back-link admin-only" style="display:none">Admin</a>
   <h1 id="game-title">Jogo</h1>
   <p id="game-sub">Página dedicada do jogo selecionado.</p>
 </header>
@@ -23,6 +23,10 @@
         <p>Status: <span id="round-phase">starting</span></p>
         <p>Round #<span id="round-index">-</span></p>
       </div>
+    </div>
+    <div id="crash-scene" class="crash-scene" aria-hidden="true">
+      <div id="crash-sprite" class="crash-sprite">✈️</div>
+      <div class="crash-track"></div>
     </div>
     <div id="multiplier">1.00x</div>
     <p id="status">Conectando...</p>
@@ -59,6 +63,16 @@
         <button type="button" id="create-round" class="pad">Criar round</button>
         <button type="button" id="auto-cashout-2" class="pad">Auto 2.0x</button>
         <button type="button" id="auto-cashout-3" class="pad">Auto 3.0x</button>
+      </div>
+      <div class="autobet-box">
+        <h3>Autoaposta</h3>
+        <div class="autobet-grid">
+          <label><input type="checkbox" id="auto-bet-enabled" /> Ativar autoaposta</label>
+          <label>Máx. rounds <input type="number" id="auto-bet-rounds" min="1" max="500" value="20" /></label>
+          <label>Atraso (ms) <input type="number" id="auto-bet-delay" min="200" value="900" /></label>
+          <label><input type="checkbox" id="auto-bet-stop-on-loss" checked /> Parar em erro</label>
+        </div>
+        <p id="auto-bet-status">Autoaposta inativa.</p>
       </div>
       <input name="round_id" id="round_id" type="number" placeholder="Round ID" required />
       <button class="primary">Apostar</button>
@@ -149,7 +163,23 @@
     </form>
     <pre id="coin-result"></pre>
   </section>
+
+  <section id="football-panel" class="game-panel" style="display:none">
+    <h2>Futebol 1X2 (Ultra)</h2>
+    <form id="football-form">
+      <input name="user_id" id="football-user-id" type="number" placeholder="User ID" required />
+      <input name="stake" id="football-stake" type="number" step="0.01" min="5" placeholder="Stake total (min 5)" required />
+      <button type="button" id="football-load-events" class="secondary">Carregar eventos</button>
+      <div id="football-events" class="football-events"></div>
+      <button>Fechar bilhete</button>
+    </form>
+    <h3>Bilhetes</h3>
+    <button type="button" id="football-history" class="secondary">Consultar meus bilhetes</button>
+    <pre id="football-result"></pre>
+    <pre id="football-history-result"></pre>
+  </section>
 </main>
+<script src="/assets/js/auth-guard.js"></script>
 <script src="/assets/js/game.js"></script>
 </body>
 </html>

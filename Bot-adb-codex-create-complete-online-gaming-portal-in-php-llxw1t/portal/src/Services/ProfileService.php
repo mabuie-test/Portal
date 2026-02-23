@@ -10,7 +10,7 @@ final class ProfileService
 {
     public function getProfile(int $userId): array
     {
-        $stmt = Database::connection()->prepare('SELECT id, user_code, full_name, email, phone, birth_date, avatar_url, status, preferences_json, created_at FROM users WHERE id=:id LIMIT 1');
+        $stmt = Database::connection()->prepare('SELECT id, role_id, user_code, full_name, email, phone, birth_date, avatar_url, status, preferences_json, created_at FROM users WHERE id=:id LIMIT 1');
         $stmt->execute(['id' => $userId]);
         $user = $stmt->fetch();
         if (!$user) {
