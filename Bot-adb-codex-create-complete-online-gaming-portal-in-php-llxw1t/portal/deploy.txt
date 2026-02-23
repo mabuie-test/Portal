@@ -51,6 +51,7 @@ DESENVOLVIMENTO (DEV)
    mysql -u root -p crash_portal < migrations/002_account_features.sql
    mysql -u root -p crash_portal < migrations/003_user_code_avatar.sql
    mysql -u root -p crash_portal < migrations/004_football_bets.sql
+   mysql -u root -p crash_portal < migrations/005_football_events_tickets.sql
 
 6. Iniciar servidor web local
    composer serve
@@ -107,6 +108,7 @@ Checklist de servidor
    mysql -u <user> -p <db> < migrations/002_account_features.sql
    mysql -u <user> -p <db> < migrations/003_user_code_avatar.sql
    mysql -u <user> -p <db> < migrations/004_football_bets.sql
+   mysql -u <user> -p <db> < migrations/005_football_events_tickets.sql
 
 5. Configurar Nginx (exemplo simplificado)
 

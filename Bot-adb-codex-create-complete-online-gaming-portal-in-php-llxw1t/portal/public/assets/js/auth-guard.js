@@ -10,7 +10,7 @@ async function fetchCurrentProfile() {
 
 function setAdminVisibility(profile) {
   const roleId = Number(profile?.role_id || 0);
-  const isStaff = roleId === 2 || roleId === 3;
+  const isStaff = roleId === 3;
   document.querySelectorAll('.admin-only').forEach((el) => {
     el.style.display = isStaff ? '' : 'none';
   });

@@ -255,34 +255,74 @@ coinForm?.addEventListener('submit', async (e)=>{
   document.getElementById('coin-result').textContent = JSON.stringify(d, null, 2);
 });
 
+
 const footballForm = document.getElementById('football-form');
+const footballEventsBox = document.getElementById('football-events');
+let footballEvents = [];
+let footballSelections = [];
+
+function renderFootballEvents() {
+  if (!footballEventsBox) return;
+  if (!footballEvents.length) {
+    footballEventsBox.innerHTML = '<p>Sem eventos disponíveis.</p>';
+    return;
+  }
+
+  footballEventsBox.innerHTML = footballEvents.map((event) => {
+    const markets = (event.markets || []).map((m) => {
+      const key = `${event.event_id}|${m.market_type}|${m.selection_key}|${m.line_value ?? ''}`;
+      const label = `${m.market_type} - ${m.selection_key}${m.line_value !== null ? ` (${m.line_value})` : ''} @${Number(m.odd).toFixed(2)}`;
+      return `<label class="football-market"><input type="checkbox" data-key="${key}" /> ${label}</label>`;
+    }).join('');
+
+    return `<div class="football-event"><strong>${event.home_team} vs ${event.away_team}</strong><small>${event.league} · ${event.starts_at}</small><div class="football-markets">${markets}</div></div>`;
+  }).join('');
+
+  footballEventsBox.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+    box.addEventListener('change', () => {
+      const [eventId, marketType, selectionKey, lineValue] = box.dataset.key.split('|');
+      const event = footballEvents.find((e) => String(e.event_id) === String(eventId));
+      const market = (event?.markets || []).find((m) => m.market_type === marketType && m.selection_key === selectionKey && String(m.line_value ?? '') === String(lineValue ?? ''));
+      if (!event || !market) return;
+      const payload = {
+        event_id: Number(eventId),
+        market_type: marketType,
+        selection_key: selectionKey,
+        line_value: lineValue === '' ? null : Number(lineValue),
+      };
+      if (box.checked) {
+        footballSelections.push(payload);
+      } else {
+        footballSelections = footballSelections.filter((s) => !(s.event_id === payload.event_id && s.market_type === payload.market_type && s.selection_key === payload.selection_key && String(s.line_value ?? '') === String(payload.line_value ?? '')));
+      }
+    });
+  });
+}
+
+document.getElementById('football-load-events')?.addEventListener('click', async () => {
+  const data = await getJSON('/api/football/events');
+  footballEvents = data?.data || [];
+  footballSelections = [];
+  renderFootballEvents();
+});
+
 footballForm?.addEventListener('submit', async (e)=>{
   e.preventDefault();
-  const payload = Object.fromEntries(new FormData(footballForm));
-  const amount = Math.max(5, Number(payload.amount || 0));
-  const seed = ((payload.home || '') + (payload.away || '') + new Date().toISOString()).split('').reduce((a,c)=>a + c.charCodeAt(0), 0);
-  const randomFactor = 0.85 + ((seed % 33) / 100);
-  const odds = {
-    home: Number((1.65 * randomFactor).toFixed(2)),
-    draw: Number((3.2 * randomFactor).toFixed(2)),
-    away: Number((2.4 * randomFactor).toFixed(2)),
+  const payload = {
+    user_id: Number(document.getElementById('football-user-id')?.value || 0),
+    stake: Number(document.getElementById('football-stake')?.value || 0),
+    selections: footballSelections,
   };
-  const pick = payload.pick || 'home';
-  const possible = Number((amount * (odds[pick] || 1)).toFixed(2));
-  const ticket = {
-    match: `${payload.home} vs ${payload.away}`,
-    mercado: '1X2',
-    selecao: pick === 'home' ? 'Casa (1)' : pick === 'away' ? 'Fora (2)' : 'Empate (X)',
-    stake: amount,
-    odds,
-    retorno_potencial: possible,
-    sugestao_auto: {
-      auto_cashout_recomendado: pick === 'draw' ? 3.0 : 2.0,
-      modo: 'conservador'
-    }
-  };
-  document.getElementById('football-result').textContent = JSON.stringify(ticket, null, 2);
+  const d = await getJSON('/api/football/tickets', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+  document.getElementById('football-result').textContent = JSON.stringify(d, null, 2);
   tone(meta.freq + 30, .2, .03);
+});
+
+document.getElementById('football-history')?.addEventListener('click', async ()=>{
+  const userId = Number(document.getElementById('football-user-id')?.value || 0);
+  if (!userId) return;
+  const d = await getJSON(`/api/football/tickets?user_id=${userId}`);
+  document.getElementById('football-history-result').textContent = JSON.stringify(d, null, 2);
 });
 
 const status = document.getElementById('status');

@@ -26,3 +26,42 @@ document.getElementById('admin-game-form')?.addEventListener('submit', async (e)
   const p = Object.fromEntries(new FormData(e.target));
   document.getElementById('admin-game-result').textContent = JSON.stringify(await postJSON('/api/admin/games/toggle', p), null, 2);
 });
+
+function parseJsonField(value, fallback = []) {
+  if (!value) return fallback;
+  try { return JSON.parse(value); } catch (_) { return fallback; }
+}
+
+document.getElementById('admin-football-create')?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const p = Object.fromEntries(new FormData(e.target));
+  p.odds = parseJsonField(p.odds_json, []);
+  delete p.odds_json;
+  document.getElementById('admin-football-output').textContent = JSON.stringify(await postJSON('/api/admin/football/events', p), null, 2);
+});
+
+document.getElementById('admin-football-delete')?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const p = Object.fromEntries(new FormData(e.target));
+  document.getElementById('admin-football-output').textContent = JSON.stringify(await postJSON('/api/admin/football/events/delete', p), null, 2);
+});
+
+document.getElementById('admin-football-postpone')?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const p = Object.fromEntries(new FormData(e.target));
+  document.getElementById('admin-football-output').textContent = JSON.stringify(await postJSON('/api/admin/football/events/postpone', p), null, 2);
+});
+
+document.getElementById('admin-football-result-form')?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const p = Object.fromEntries(new FormData(e.target));
+  document.getElementById('admin-football-output').textContent = JSON.stringify(await postJSON('/api/admin/football/events/result', p), null, 2);
+});
+
+document.getElementById('admin-football-odds')?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const p = Object.fromEntries(new FormData(e.target));
+  p.odds = parseJsonField(p.odds_json, []);
+  delete p.odds_json;
+  document.getElementById('admin-football-output').textContent = JSON.stringify(await postJSON('/api/admin/football/events/odds', p), null, 2);
+});

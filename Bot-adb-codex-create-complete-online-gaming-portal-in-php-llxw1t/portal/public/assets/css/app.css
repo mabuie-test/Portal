@@ -95,3 +95,10 @@ pre{background:#0b1324;padding:.5rem;border-radius:6px;min-height:64px;overflow:
 .pad.selected{background:linear-gradient(145deg,#f59e0b,#d97706);color:#2a1702;border-color:#facc15}
 
 .hero:after{content:'';position:absolute;inset:auto -90px -90px auto;width:260px;height:260px;border-radius:999px;background:radial-gradient(circle,#22d3ee44 0,#0000 70%);pointer-events:none}
+
+textarea{display:block;width:100%;margin:.4rem 0;padding:.6rem;border-radius:6px;border:1px solid #334155;background:#0b1324;color:#dbeafe;min-height:88px}
+.football-events{display:grid;gap:.6rem;margin:.6rem 0}
+.football-event{background:#0b1324;border:1px solid #334155;border-radius:10px;padding:.6rem}
+.football-event small{display:block;color:#93c5fd;margin:.2rem 0 .4rem}
+.football-markets{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.4rem}
+.football-market{display:flex;gap:.45rem;align-items:flex-start;padding:.35rem .45rem;border:1px solid #1f2937;border-radius:8px;background:#111827;color:#e2e8f0;font-size:.86rem}
