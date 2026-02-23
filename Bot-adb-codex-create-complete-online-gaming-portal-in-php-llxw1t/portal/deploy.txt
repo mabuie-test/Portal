@@ -1,0 +1,179 @@
+Crash Portal - Guia de execução e deploy
+=======================================
+
+Este documento descreve como executar o projeto em:
+1) modo desenvolvimento (local)
+2) modo produção (servidor)
+
+Pré-requisitos
+--------------
+- PHP 8.2+
+- Composer 2+
+- MySQL 8+ ou MariaDB 10.6+
+- Extensões PHP ativas: pdo, pdo_mysql, json
+
+Estrutura importante
+--------------------
+- public/           -> front-end estático + front controller (index.php)
+- src/              -> código da aplicação
+- migrations/       -> scripts SQL
+- scripts/          -> workers e utilitários
+- storage/          -> ficheiros operacionais (ex.: reconciliação)
+
+=======================================
+DESENVOLVIMENTO (DEV)
+=======================================
+
+1. Entrar na pasta do projeto
+   cd portal
+
+2. Instalar dependências
+   composer install
+
+3. Criar o ficheiro de ambiente
+   cp .env.example .env
+
+4. Configurar variáveis no .env (mínimo)
+   APP_ENV=dev
+   APP_DEBUG=1
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=crash_portal
+   DB_USERNAME=seu_user
+   DB_PASSWORD=sua_password
+   APP_KEY=<chave_forte>
+   MASTER_SEED_KEY=<chave_base64_forte>
+   SESSION_SECURE=0
+
+5. Criar base de dados e aplicar migrations
+   mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS crash_portal CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   mysql -u root -p crash_portal < migrations/001_init.sql
+   mysql -u root -p crash_portal < migrations/002_account_features.sql
+   mysql -u root -p crash_portal < migrations/003_user_code_avatar.sql
+   mysql -u root -p crash_portal < migrations/004_football_bets.sql
+
+6. Iniciar servidor web local
+   composer serve
+   # aplicação disponível em: http://localhost:8080
+
+7. (Opcional) Iniciar serviços auxiliares
+   - Motor de rounds:
+     composer rounds
+   - Worker de filas:
+     composer worker
+   - WebSocket:
+     composer ws
+
+8. Testar funcionamento
+   composer test
+   curl http://localhost:8080/api/games
+
+Observações DEV
+---------------
+- O acesso à raiz "/" abre o lobby (index.html).
+- Rotas "/api/*" devolvem JSON.
+- Para sessão local sem HTTPS, mantenha SESSION_SECURE=0.
+
+=======================================
+PRODUÇÃO
+=======================================
+
+Checklist de servidor
+---------------------
+- Linux atualizado (Ubuntu/Debian/RHEL)
+- Nginx ou Apache com HTTPS válido
+- PHP-FPM 8.2+
+- MySQL/MariaDB com backups automáticos
+- Supervisor/systemd para workers
+
+1. Preparar diretórios
+   /var/www/portal
+   /var/www/portal/current
+   /var/www/portal/shared/.env
+
+2. Publicar código
+   - Faça checkout/tag da versão
+   - Execute: composer install --no-dev --optimize-autoloader
+
+3. Configurar .env de produção
+   APP_ENV=prod
+   APP_DEBUG=0
+   SESSION_SECURE=1
+   DB_* com credenciais de produção
+   APP_KEY e MASTER_SEED_KEY geradas de forma segura (Vault/KMS)
+
+4. Aplicar migrations (janela controlada)
+   mysql -u <user> -p <db> < migrations/001_init.sql
+   mysql -u <user> -p <db> < migrations/002_account_features.sql
+   mysql -u <user> -p <db> < migrations/003_user_code_avatar.sql
+   mysql -u <user> -p <db> < migrations/004_football_bets.sql
+
+5. Configurar Nginx (exemplo simplificado)
+
+   server {
+       listen 80;
+       server_name portal.seudominio.com;
+       return 301 https://$host$request_uri;
+   }
+
+   server {
+       listen 443 ssl http2;
+       server_name portal.seudominio.com;
+
+       root /var/www/portal/current/public;
+       index index.php index.html;
+
+       # SSL configurado com Let's Encrypt ou certificado corporativo
+
+       location / {
+           try_files $uri $uri/ /index.php?$query_string;
+       }
+
+       location ~ \.php$ {
+           include snippets/fastcgi-php.conf;
+           fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+           fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+           include fastcgi_params;
+       }
+
+       location ~* \.(css|js|svg|png|jpg|jpeg|gif|ico)$ {
+           expires 7d;
+           add_header Cache-Control "public, max-age=604800";
+       }
+   }
+
+6. Configurar processos em background
+
+   Supervisor (exemplo):
+   - php /var/www/portal/current/scripts/run_rounds.php
+   - php /var/www/portal/current/scripts/run_worker.php
+   - php /var/www/portal/current/scripts/start_websocket.php
+
+   Habilitar autorestart e logs separados.
+
+7. Permissões
+   - www-data com leitura no código
+   - escrita apenas onde necessário (logs/storage)
+   - .env com permissões restritas (600)
+
+8. Verificações pós-deploy
+   - Healthcheck HTTP: GET /
+   - API: GET /api/games
+   - Login/registo
+   - Fluxo de depósito manual
+   - Execução de worker e rounds sem erro
+
+9. Operação contínua
+   - Rotação de logs
+   - Backup diário da base de dados
+   - Monitorização (CPU, RAM, fila, erros HTTP 5xx)
+   - Plano de rollback (release anterior pronta)
+
+Comandos úteis
+--------------
+- Testes:
+  composer test
+- Reconciliar extrato CSV:
+  php scripts/reconcile_csv.php storage/reconciliation/sample_statement.csv
+- Gerar pacote de distribuição:
+  composer package
